@@ -67,6 +67,17 @@ CovidLastUp  </title>
 <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
 
 <link href="css/theme.css" rel="stylesheet" media="all">
+<script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+
+</script>
 
 
   <!--Custom Font-->
@@ -248,10 +259,8 @@ margin-top:12px;
                 </div>
               </div>
               <div class="main-panel">
-                <div class="row center" id="filter_section"  >
-                  <div id="ev">
                 <select  class="selectpicker countrypicker"  name="ar" data-live-search="true"  data-flag="true"></select>
-                </div >
+                <div class="row center" id="filter_section"  >
                 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
                 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
@@ -522,26 +531,107 @@ margin-top:12px;
   <script src="./assets/js/core/popper.min.js"></script>
   <script src="./assets/js/core/bootstrap.min.js"></script>
   <script src="./assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.2/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.1.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.2.3/firebase-storage.js"></script>
+
+
   <!--  Google Maps Plugin    -->
   <!-- Place this tag in your head or just before your close body tag. -->
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
   <!-- Chart JS -->
   <script src="./assets/js/plugins/chartjs.min.js"></script>
+  <script type="text/javascript" src="https://cdn.firebase.com/v0/firebase.js"></script>
   <!--  Notifications Plugin    -->
   <script src="./assets/js/plugins/bootstrap-notify.js"></script>
   <!-- Control Center for Black Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="./assets/js/black-dashboard.min.js?v=1.0.0"></script><!-- Black Dashboard DEMO methods, don't include it in your project! -->
   <script src="./assets/demo/demo.js"></script>
+
+
   <script>
     $(document).ready(function() {
+      /*var firebaseConfig = {
+                      apiKey: "AIzaSyD0ogwhSO9wT-iXXszCNoHvZ2x3Ksw30ag",
+                      authDomain: "fir-test-97234.firebaseapp.com",
+                      databaseURL: "https://fir-test-97234.firebaseio.com",
+                      projectId: "fir-test-97234",
+                      storageBucket: "fir-test-97234.appspot.com",
+                      messagingSenderId: "836168883253",
+                      appId: "1:836168883253:web:650a0ec30f33dbbfea657c",
+                      measurementId: "G-PN0REY4Z23"
+                  };
+                  // Initialize Firebase
+                  firebase.initializeApp(firebaseConfig);
+                  firebase.analytics();
+                  const db = firebase.firestore();
+                  var g2 = new Date();
+                  console.log(x[9]);
+                  var heure = g2.getHours();
+                  var minutes = g2.getMinutes();
+                  heurenow = heure + ":" + minutes + ":00";
+                  delai = "2:30:00";
+                  console.log(heurenow);
+                  console.log(new Date('1/1/1999 ' + heurenow));
+                  console.log(new Date('1/1/1999 ' + delai));
+                  idCollection = g2.getFullYear() + "-" + (g2.getMonth() + 1) + "-" + (g2.getDate() - 1);
+                  console.log(heure);
+                  db.collection(idCollection).get().then((snapshots) => {
+                      console.log(heure);
+                      if (snapshots.docs[0] != undefined) {
+                          console.log("l'element existe deja");
+                      } else {
+                          if (new Date('1/1/1999 ' + heurenow) > new Date('1/1/1999 ' + delai)) {
+                              for (i = 0; i < pays.length; i++) {
+                                  db.collection(idCollection).add({
+                                      pays: pays[i],
+                                      confirmer: confirmeTable[i],
+                                      mort: mortTable[i],
+                                      recovered: x[9][i]
+                                  })
+                                  console.log("les donnees sont stockees");
+                              }
+                          } else {
+                              console.log("les donnes ne sont pas encore arriver");
+                          }
+
+                      }
+                  })
+                  */
+                  // Your web app's Firebase configuration
+              var firebaseConfig = {
+                apiKey: "AIzaSyBpKo1BBXVugVxDjP7k62S2ub2IJM9PoPk",
+    authDomain: "covidstorage.firebaseapp.com",
+    databaseURL: "https://covidstorage.firebaseio.com",
+    projectId: "covidstorage",
+    storageBucket: "covidstorage.appspot.com",
+    messagingSenderId: "513479571089",
+    appId: "1:513479571089:web:66d013ae9d914270507130",
+    measurementId: "G-R9BMPS4F3X"
+              };
+              // Initialize Firebase
+              firebase.initializeApp(firebaseConfig);
       var a=0;
       var b=0;
       var c=0;
       var d=0;
-
+      var ref=firebase.database().ref();
       var t=[]
     $.getJSON( "https://pomber.github.io/covid19/timeseries.json", function( dat ) {
       $.each( dat, function(key, data) {
+        console.log("tar" + JSON.stringify(data[data.length-1]));
+        var usersRef1 = ref.child(data[data.length-1].date);
+
+        var usersRef = usersRef1.child(key);
+        usersRef.set({
+          cases:data[data.length-1].confirmed,
+          deaths:data[data.length-1].deaths,
+          recovered:data[data.length-1].recovered,
+        })
+
       const collection = data.map(x => ({ ...x, date: x.date.split("-"), confirmed: Number(x.confirmed)}));
 
         const mapDayToMonth = collection.map(x => ({...x, date: new Date(x.date).getMonth()}));
@@ -1075,13 +1165,6 @@ var snip=[]
         });
       });
 
-  </script>
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
-
-    });
   </script>
   <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
