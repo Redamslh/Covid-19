@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <title>TimeSeries@TensorFlow.js</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.3/dist/tf.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+  <script src="./src/generators.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/readable/bootstrap.min.css">
+  <link href="css/theme.css" rel="stylesheet" media="all">
+
+  <script src="./src/model.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-range/4.0.1/moment-range.js"></script>
+  <link rel="stylesheet" href="css/mobiscroll.javascript.min.css">
+  <script src="js/mobiscroll.javascript.min.js"></script>
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="stylesheet" href="fixed-navigation-bar.css">
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <link rel="shortcut icon" href="http://sixrevisions.com/favicon.ico">
+  <style type="text/css">
+
+  #cnt{
+    margin-left:40px;
+  }
+
+  .header {
+    padding: 1px;
+    text-align: center;
+    background: #1abc9c;
+    color: white;
+    font-size: 30px;
+   border-bottom:2px solid #e14eca;
+  }
+  .alert-info{
+    background-color:#1abc9c;
+    margin-top:50px;
+  }
+  #dt{
+    height: 38px;
+    background: #dedddd;
+    box-shadow: 0 1px 20px 0px rgba(0, 0, 0, 0.1);
+  }
+  #lm{
+  margin-left:1700px;
+    font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  #m{
+  margin-left:1700px;
+    font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  #nm{
+  font-size:40px;
+  margin-top:12px;
+  color:#333333;
+  font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  #cl{
+    margin-left:220px;
+  }
+  .nv{
+    background: #e14eca;
+    height:25px;
+
+  }
+  .btn btn-primar{
+    border:2px solid #e14eca;
+    height: 100px;
+  }
+  html, body{
+      background: linear-gradient(#1e1e2f, #1e1e24);
+      padding-top: 50px;
+    }
+    .wrapper{
+      width:60%;
+      display:block;
+      overflow:hidden;
+      margin:0 auto;
+      padding: 60px 50px;
+      background:#27293d;
+      border-radius:4px;
+      box-shadow: 0 1px 20px 0px rgba(0, 0, 0, 0.1);
+    }
+    canvas{
+      background:#27293d;
+    }
+  body {
+      margin: 0;
+      padding: 0;
+  }
+  button {
+      display: inline-block;
+      outline: 0;
+      border: 0;
+      cursor: pointer;
+      background: #1abc9c;
+      color: #fff;
+      text-decoration: none;
+      font-family: arial, verdana, sans-serif;
+      font-size: 14px;
+  }
+  .demo-non-form {
+      color: initial;
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 0;
+      font-family: arial, verdana, sans-serif;
+      font-size: 14px;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+  }
+
+  .demo-container {
+      padding: 0 1em;
+  }
+
+  .external-container {
+      display: flex;
+  }
+
+  .external-container button.external-button {
+      font-weight: 400;
+      padding: 10px;
+      margin: 6px 0 12px 16px;
+  }
+  .hd{
+    margin-top: 50px;
+  }
+  #lb{
+    margin-left:40px;
+    margin-top: 1px;
+    color:white;
+  }
+  </style>
+  <script type="text/javascript">
+  $(function() {
+    $('input[name="birthday"]').daterangepicker({
+      singleDatePicker: true,
+      showDropdowns: true,
+      minYear: 1901,
+      maxYear: parseInt(moment().format('YYYY'),10)
+    }, function(start, end, label) {
+      var years = moment().diff(start, 'years');
+      alert("You are " + years + " years old!");
+    });
+  });
+   var input_dataset = [], result = [];
+   var data_raw = []; var sma_vec = [];
+
+   function Init() {
+     mobiscroll.settings = {
+         lang: 'en',                      // Specify language like: lang: 'pl' or omit setting to use default
+         theme: 'ios',                    // Specify theme like: theme: 'ios' or omit setting to use default
+         themeVariant: 'light'            // More info about themeVariant: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-themeVariant
+     };
+
+     var remoteData = {
+         url: 'https://trial.mobiscroll.com/content/countries.json',
+         type: 'json'
+     };
+
+     mobiscroll.select('#demo-country-filter', {
+         display: 'bubble',               // Specify display mode like: display: 'bottom' or omit setting to use default
+         data: remoteData,                // More info about data: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-data
+         filter: true,                    // More info about filter: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-filter
+         group: {                         // More info about group: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-group
+             groupWheel: false,
+             header: false
+         },
+         width: 400,                      // More info about width: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-width
+         placeholder: 'Please Select...'  // More info about placeholder: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-placeholder
+     });
+
+     mobiscroll.select('#demo-country-group', {
+         display: 'bubble',               // Specify display mode like: display: 'bottom' or omit setting to use default
+         data: remoteData,                // More info about data: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-data
+         group: true,                     // More info about group: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-group
+         width: [40, 240],                // More info about width: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-width
+         placeholder: 'Please Select...'  // More info about placeholder: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-placeholder
+     });
+
+     mobiscroll.select('#demo-country-filter-desktop', {
+         display: 'bubble',               // Specify display mode like: display: 'bottom' or omit setting to use default
+         touchUi: false,                  // More info about touchUi: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-touchUi
+         data: remoteData,                // More info about data: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-data
+         filter: true,                    // More info about filter: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-filter
+         group: {                         // More info about group: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-group
+             groupWheel: false,
+             header: false
+         },
+         width: 400,                      // More info about width: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-width
+         placeholder: 'Please Select...'  // More info about placeholder: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-placeholder
+     });
+
+     mobiscroll.select('#demo-country-group-desktop', {
+         display: 'bubble',               // Specify display mode like: display: 'bottom' or omit setting to use default
+         touchUi: false,                  // More info about touchUi: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-touchUi
+         data: remoteData,                // More info about data: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-data
+         group: true,                     // More info about group: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-group
+         placeholder: 'Please Select...'  // More info about placeholder: https://docs.mobiscroll.com/4-10-3/javascript/select#opt-placeholder
+     });
+      initTabs('Dataset'); initDataset();
+      document.getElementById("n-items").value = "50";
+      document.getElementById("window-size").value = "12";
+      document.getElementById('input-data').addEventListener('change', readInputFile, false);
+   }
+
+   function initTabs(tab) {
+      var navbar = document.getElementsByClassName("nav navbar-nav");
+      navbar[0].getElementsByTagName("li")[0].className += "active";
+      document.getElementById("dataset").style.display = "none";
+      document.getElementById("graph-plot").style.display = "none";
+
+      setContentView(tab);
+   }
+
+   function setTabActive(event, tab) {
+      var navbar = document.getElementsByClassName("nav navbar-nav");
+      var tabs = navbar[0].getElementsByTagName("li");
+      for (var index = 0; index < tabs.length; index++)
+           if (tabs[index].className == "active")
+               tabs[index].className = "";
+
+      if (event.currentTarget != null) {
+          event.currentTarget.className += "active";
+      }
+
+      var callback = null;
+      if (tab == "Neural Network") {
+          callback = function () {
+             document.getElementById("train_set").innerHTML = getSMATable(1);
+          }
+      }
+
+      setContentView(tab, callback);
+   }
+
+   function setContentView(tab, callback) {
+      var tabs_content = document.getElementsByClassName("container");
+      for (var index = 0; index < tabs_content.length; index++)
+           tabs_content[index].style.display = "none";
+
+      if (document.getElementById(tab).style.display == "none")
+          document.getElementById(tab).style.display = "block";
+
+      if (callback != null) {
+          callback();
+      }
+   }
+
+   function readInputFile(e) {
+      var file = e.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+          var contents = e.target.result;
+          document.getElementById("input-data").value = "";
+          parseCSVData(contents);
+      };
+      reader.readAsText(file);
+   }
+
+   function parseCSVData(contents) {
+      data_raw = []; sma_vec = [];
+      var rows = contents.split("\n");
+
+      var params = rows[0].split(",");
+      var size = parseInt(params[0].split("=")[1]);
+      var window_size = parseInt(params[1].split("=")[1]);
+
+      document.getElementById("n-items").value = size.toString();
+      document.getElementById("window-size").value = window_size.toString();
+
+      for (var index = 1; index < size + 1; index++) {
+          var cols = rows[index].split(",");
+          data_raw.push({ id: cols[0], timestamp: cols[1], price: cols[2] });
+      }
+
+      sma_vec = ComputeSMA(data_raw, window_size);
+      onInputDataClick();
+   }
+
+   function initDataset() {
+     var s = document.getElementsByName('ar')[0];
+     s.addEventListener("change", changeOrg);
+
+     function changeOrg(){
+       if (s.options[s.selectedIndex]!=null)
+       {
+         var val = s.options[s.selectedIndex].text;
+         console.log(val);
+      var n_items = parseInt(document.getElementById("n-items").value);
+      var window_size = parseInt(document.getElementById("window-size").value);
+      $.getJSON( "https://pomber.github.io/covid19/timeseries.json", function( Afghanistan ) {
+
+        $.each( Afghanistan, function(key, value) {
+
+        if (key==val){
+      data_raw = value;
+      sma_vec = ComputeSMA(data_raw, window_size);
+      console.log("2020-1-22"+2)
+      Date.prototype.addDays = function(days) {
+  this.setDate(this.getDate() + parseInt(days));
+  return this;
+
+};
+
+// and then call
+//nbre of days betwwen
+let today = new Date().toISOString().slice(0, 10)
+const date1 = new Date('7/13/2019');
+const date2 = new Date(today);
+const diffTime = Math.abs(date2 - date1);
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+console.log(diffDays);
+//////////////////////////////////////////////
+console.log(today)
+///////days between two dates/////////////
+var listDate = [];
+var startDate ='2017-02-01';
+var endDate = today;
+var dateMove = new Date(startDate);
+var strDate = startDate;
+
+while (strDate < endDate){
+  var strDate = dateMove.toISOString().slice(0,10);
+  listDate.push(strDate);
+  dateMove.setDate(dateMove.getDate()+1);
+};
+console.log(listDate);
+///////////////////////////////////////
+   }
+ })
+})
+}
+};
+}
+
+   async function onTrainClick() {
+     var tb=[];
+      var inputs = sma_vec.map(function(inp_f) {
+          return inp_f['set'].map(function(val) { return val['confirmed']; })});
+      var outputs = sma_vec.map(function(outp_f) { return outp_f['avg']; });
+
+      var n_epochs     = 2
+      var window_size  = parseInt(document.getElementById("window-size").value);
+      var lr_rate      = parseFloat(document.getElementById("learning-rate").value);
+      var n_hl         = parseInt(document.getElementById("hidden-layers").value);
+      var n_items      = parseInt(document.getElementById("n-items-percent").value);
+
+      var callback = function(epoch, log) {
+          var log_nn = document.getElementById("nn_log").innerHTML;
+          log_nn += "<div>Epoch: " + (epoch + 1) + " Loss: " + log.loss + "</div>";
+          document.getElementById("nn_log").innerHTML = log_nn;
+          document.getElementById("training_pg").style.width = ((epoch + 1) * (100 / n_epochs)).toString() + "%";
+       	  document.getElementById("training_pg").innerHTML = ((epoch + 1) * (100 / n_epochs)).toString() + "%";
+      }
+
+      result = await trainModel(inputs, outputs,
+	n_items, window_size, n_epochs, lr_rate, n_hl, callback);
+
+      var inputs = sma_vec.map(function(inp_f) {
+  return inp_f['set'].map(function (val) { return val['confirmed']; }); });
+      var outputs = sma_vec.map(function(outp_f) { return outp_f['avg']; });
+
+      var n_items = parseInt(document.getElementById("n-items-percent").value);
+
+      var outps = outputs.slice(Math.floor(n_items / 100 * outputs.length), outputs.length);
+
+      var pred_vals = Predict(inputs, n_items, result['model']);
+
+      var data_output = "";
+      for (var index = 0; index < pred_vals.length; index++) {
+           data_output += "<tr><td>" + (index + 1) + "</td><td>" +
+        outps[index] + "</td><td>" + pred_vals[index]*1000 + "</td></tr>";
+      }
+
+      document.getElementById("pred-res").innerHTML = "<table class=\"table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Real Value</th> \
+  <th scope=\"col\">Predicted Value</th></thead><tbody>" + data_output + "</tbody></table>";
+
+      var window_size  = parseInt(document.getElementById("window-size").value);
+
+      var timestamps_a = data_raw.map(function (val) { return val['date']; });
+      var timestamps_b = data_raw.map(function (val) {
+  return val['date']; }).splice(window_size, data_raw.length);
+
+      var timestamps_c = data_raw.map(function (val) {
+  return val['date']; }).splice(window_size + Math.floor(n_items / 100 * outputs.length), data_raw.length);
+
+      var sma = sma_vec.map(function (val) { return val['avg']; });
+      var prices = data_raw.map(function (val) { return val['confirmed']; });
+
+      var graph_plot = document.getElementById('graph-pred');
+
+      Plotly.newPlot( graph_plot, [{ x: timestamps_a, y: prices, name: "Series" }], { margin: { t: 0 } } );
+      Plotly.plot( graph_plot, [{ x: timestamps_b, y: sma, name: "SMA" }], { margin: { t: 0 } } );
+      Plotly.plot( graph_plot, [{ x: timestamps_c, y: pred_vals, name: "Predicted" }], { margin: { t: 0 } } );
+      console.log(prices)
+      console.log(sma)
+      console.log(parseInt(sma[10]))
+      var dte = document.getElementById('dt').value;
+      let today = new Date().toISOString().slice(0, 10)
+      const date1 = new Date(today);
+      const date2 = new Date(dte);
+      const diffTime = Math.abs(date2 - date1);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      console.log(diffDays);
+      //////////////////////////////////////////////
+      console.log(today)
+      ///////days between two dates/////////////
+      var listDate = [];
+      var startDate =today;
+      var endDate = dte;
+      var dateMove = new Date(startDate);
+      var strDate = startDate;
+
+      while (strDate < endDate){
+        var strDate = dateMove.toISOString().slice(0,10);
+        listDate.push(strDate);
+        dateMove.setDate(dateMove.getDate()+1);
+      };
+      console.log(listDate);
+      function getAvg(grades) {
+  const total = grades.reduce((acc, c) => acc + c, 0);
+  return total / grades.length;
+}
+
+const average = getAvg(sma);
+console.log(average);
+var s=0 ;
+      for (var i = 0; i < diffDays+1; i++) {
+        s=s+average
+           tb.push(parseInt(s)+prices[prices.length-1])
+}
+console.log(tb)
+var ctx = document.getElementById('myChart').getContext("2d");
+
+var myChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+      labels: listDate,
+      datasets: [{
+          label: "Cases Predicted",
+          borderColor: "#e14eca",
+          pointBorderColor: "#e14eca",
+          pointBackgroundColor: "#80b6f4",
+          pointHoverBackgroundColor: "#e14eca",
+          pointHoverBorderColor: "#e14eca",
+          pointBorderWidth: 10,
+          pointHoverRadius: 10,
+          pointHoverBorderWidth: 1,
+          pointRadius: 3,
+          fill: false, // If true, fill the area under the line.
+          borderWidth: 4,
+          data: tb
+      }]
+  },
+  options: {
+      legend: {
+          position: "bottom"
+      },
+      scales: {
+          yAxes: [{
+              ticks: {
+                  fontColor: "rgba(0,0,0,0.5)",
+                  fontStyle: "bold",
+                  beginAtZero: true, // If true, scale will include 0 if it is not already included.
+                  maxTicksLimit: 5,  // Maximum number of ticks and gridlines to show.
+                  padding: 20        // Padding between the tick label and the axis.
+              },
+              gridLines: {
+                  drawTicks: false, // If true, draw lines beside the ticks in the axis area beside the chart.
+                  display: false
+              }
+          }],
+          xAxes: [{
+              gridLines: {
+                  zeroLineColor: "transparent" // Stroke color of the grid line for the first index (index 0).
+              },
+              ticks: {
+                  padding: 20,
+                  fontColor: "rgba(0,0,0,0.5)",
+                  fontStyle: "bold"
+              }
+          }]
+      }
+  }
+});
+
+   }
+
+
+   function getInputDataTable() {
+      var data_output = "";
+      for (var index = 0; index < data_raw.length; index++)
+      {
+           data_output += "<tr><td>" + data_raw[index]['id'] + "</td><td>" +
+	    data_raw[index]['date'] + "</td><td>" + data_raw[index]['confirmed'] + "</td></tr>";
+      }
+
+      return "<table class=\"table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Confirmed</th> \
+	<th scope=\"col\">Feature</th></thead><tbody>" + data_output + "</tbody></table>";
+   }
+
+   function getSMATable(view) {
+      var data_output = "";
+      if (view == 0) {
+          for (var index = 0; index < sma_vec.length; index++)
+          {
+               var set_output = "";
+               var set = sma_vec[index]['set'];
+               for (var t = 0; t < set.length; t++) {
+                   set_output += "<tr><td width=\"30px\">" + set[t]['confirmed'] +
+	             "</td><td>" + set[t]['date'] + "</td></tr>";
+               }
+
+               data_output += "<tr><td width=\"20px\">" + (index + 1) +
+     	        "</td><td>" + "<table width=\"100px\" class=\"table\">" + set_output +
+		  "<tr><td><b>" + "SMA(t) = " + sma_vec[index]['avg'] + "</b></tr></td></table></td></tr>";
+          }
+
+          return "<table class=\"table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">Time Series</th>\
+	   	</thead><tbody>" + data_output + "</tbody></table>";
+      }
+
+      else if (view == 1) {
+          var set = sma_vec.map(function (val) { return val['set']; });
+
+          for (var index = 0; index < sma_vec.length; index++)
+          {
+               data_output += "<tr><td width=\"20px\">" + (index + 1) +
+     	        "</td><td>[ " + set[index].map(function (val) {
+		    return (Math.round(val['confirmed'] * 10000) / 10000).toString(); }).toString() +
+			" ]</td><td>" + sma_vec[index]['avg'] + "</td></tr>";
+          }
+
+          return "<table class=\"table\"><thead><tr><th scope=\"col\">#</th><th scope=\"col\">\
+             Input</th><th scope=\"col\">Output</th></thead><tbody>" + data_output + "</tbody></table>";
+      }
+   }
+
+   function onInputDataClick() {
+      document.getElementById("dataset").style.display = "block";
+      document.getElementById("graph-plot").style.display = "block";
+      document.getElementById("data").innerHTML = getInputDataTable();
+
+      var timestamps = data_raw.map(function (val) { return val['confirmed']; });
+      var prices = data_raw.map(function (val) { return val['date']; });
+
+      var graph_plot = document.getElementById('graph');
+      Plotly.newPlot( graph_plot, [{ x: timestamps, y: prices, name: "Stocks Prices" }], { margin: { t: 0 } } );
+   }
+
+   function onSMAClick() {
+      document.getElementById("data").innerHTML = getSMATable(0);
+
+      var sma = sma_vec.map(function (val) { return val['avg']; });
+      var prices = data_raw.map(function (val) { return val['confirmed']; });
+
+      var window_size = parseInt(document.getElementById("window-size").value);
+
+      var timestamps_a = data_raw.map(function (val) { return val['date']; });
+      var timestamps_b = data_raw.map(function (val) {
+	return val['date']; }).splice(window_size, data_raw.length);
+
+      var graph_plot = document.getElementById('graph');
+      Plotly.newPlot( graph_plot, [{ x: timestamps_a, y: prices, name: "Series" }], { margin: { t: 0 } } );
+      Plotly.plot( graph_plot, [{ x: timestamps_b, y: sma, name: "SMA" }], { margin: { t: 0 } } );
+   }
+
+  </script>
+  <head>
+    <div class="header">
+      <h1 id="nm">CLU</h1>
+      <h6 id="lm">Covid19LastUpdate </h6>
+      <h6 id="m">#STAYHOME</h6>
+    </div>
+    <div class="nv">
+      <center>
+      <ul class="menu-items" style="text-align:center">
+        <li><a href="index.html">Stats</a></li>
+        <li><a href="Pred.html">Prediction</a></li>
+  </ul>
+  </center>
+
+</head>
+<body onload="Init()" class='bd'>
+
+   <tr>
+    <td>
+      <nav class="navbar navbar-default" hidden>
+       <div class="container-fluid">
+        <div class="navbar-header">
+         <a class="navbar-brand" href="#">TimeSeries@TensorFlow.js</a>
+        </div>
+       <ul class="nav navbar-nav">
+        <li onclick="setTabActive(event, 'Dataset')"><a href="#">Dataset</a></li>
+       </ul>
+      </div>
+     </nav>
+    </td>
+   </tr>
+   <tr>
+     <div id="Dataset" class="container">
+      <table width="100%">
+       <tr>
+        <td>
+         <table width="100%">
+          <tr>
+           <td width="60%" align="left">
+            <table width="100%">
+             <tr>
+              <td width="10px" hidden><b>&nbsp;N-Items:&nbsp;</b></td>
+              <td width="120px"hidden><input class="form-control input-sm" id="n-items" type="text" size="1" value="500"></td>
+              <td width="120px"hidden><b>&nbsp;&nbsp;&nbsp;Window Size:&nbsp;</b></td>
+              <td width="100px"hidden><input class="form-control input-sm" id="window-size" type="text" size="1" value="12"></td>
+             </tr>
+            </table>
+           </td>
+          </tr>
+         </table>
+        </td>
+       </tr>
+       <tr>
+        <td width="100%" id="dataset" hidden><hr/>
+         <hr/>
+         <div id="data" style="overflow-y: scroll; max-height: 300px;" hidden></div>
+        </td>
+       </tr>
+       <tr><td width="100%" id="graph-plot" hidden><hr/><div id="graph" style="width:100%; height:350px;"></div></td></tr>
+      </table>
+<div class="hd" >
+
+      <div class="mbsc-col-sm-12 mbsc-col-md-6" >
+
+          <label>
+              Countries
+              <select mbsc-dropdown data-input-style="box" id="demo-country-filter-desktop" name="ar" ></select>
+          </label>
+      </div>
+      <label id="lb">From Now To :</label>
+  <div id="cnt">
+         <input  id="dt" type="date" size="1" required>
+         <button type="button" class="btn btn-primar" onclick="onTrainClick()">Predict</button>
+         </div>
+       </br>
+       </br>
+       </br>
+
+         <div class="progress" hidden>
+          <div id="training_pg" class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div>
+         </div>
+<h1 id="cl">Cases Predicted</h1>
+          <div class="wrapper">
+
+    <canvas id="myChart"></canvas>
+  </div>
+  <div class="alert alert-info"  >
+    <strong>Info!</strong> This results are not 100% True,the evolution of the virus depend on measures taken by country
+  </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+
+         <table width="100%" height="100%" hidden>
+          <tr>
+           <td width="80%"><div id="train_set" style="overflow-x: scroll; overflow-y: scroll; max-width: 900px; max-height: 300px;"></div></td>
+           <td>
+            <table width="100%" class="table" hidden>
+             <tr>
+              <td>
+               <label>Size (%):</label>
+               <input class="form-control input-sm" id="n-items-percent" type="text" size="1" value="50">
+               <div mbsc-page class="demo-country-picker">
+                   <div mbsc-form class="mbsc-form-box">
+                       <div class="mbsc-grid mbsc-form-grid">
+                           <div class="mbsc-form-group">
+                               <div class="mbsc-form-group-title">Use it on desktop</div>
+                               <div class="mbsc-row">
+                                   <div class="mbsc-col-sm-12 mbsc-col-md-6">
+                                       <label>
+                                           Group select
+                                           <select mbsc-dropdown data-input-style="box" id="demo-country-group-desktop"></select>
+                                       </label>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+              </td>
+             </tr>
+             <tr>
+              <td>
+               <label>Epochs:</label>
+               <input class="form-control input-sm" id="n-epochs" type="text" size="1" value="200">
+              </td>
+             </tr>
+             <tr>
+              <td>
+               <label>Learning Rate:</label>
+               <input class="form-control input-sm" id="learning-rate" type="text" size="1" value="0.01">
+              </td>
+             </tr>
+             <tr>
+              <td>
+               <label>Hidden Layers:</label>
+               <input class="form-control input-sm" id="hidden-layers" type="text" size="1" value="4">
+              </td>
+             </tr>
+            </table>
+           </td>
+          </tr>
+          <tr>
+           <td><hr/><div id="nn_log" style="overflow-x: scroll; overflow-y: scroll; max-width: 900px; max-height: 250px;"></div></td>
+          </tr>
+         </table>
+        </td>
+       </tr>
+     </div>
+     </div>
+     <div id="Prediction" class="container">
+      <table width="100%">
+       <tr><td><button type="button" class="btn btn-primary" onclick="onPredictClick()">Predict</button><hr/></td></tr>
+       <tr><td><div id="pred-res" style="overflow-x: scroll; overflow-y: scroll; max-height: 300px;"></div></td></tr>
+       <tr><td id="graph-pred"><hr/><div id="graph" style="height:300px;"></div></td></tr>
+      </table>
+     </div>
+    </td>
+   </tr>
+ </table>
+
+</body>
+</html>
