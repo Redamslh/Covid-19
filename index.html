@@ -32,9 +32,6 @@ CovidLastUp  </title>
   <link href="./assets/demo/demo.css" rel="stylesheet" />
   <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="./assets/img/favicon.png">
-  <title>
-    Black Dashboard by Creative Tim
-  </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
   <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
@@ -63,6 +60,10 @@ CovidLastUp  </title>
   <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.6/Chart.js"></script>
 
+  <link rel="stylesheet" href="assets/base.css">
+  <link rel="stylesheet" href="fixed-navigation-bar.css">
+
+
 
 <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
 
@@ -83,6 +84,10 @@ CovidLastUp  </title>
   <!--Custom Font-->
   <link href="https://fonts.googleapis.com/css?family=Montserrat:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <style>
+    .nv{
+      background: #e14eca;
+      height:25px;
+    }
   body {
     font-family: Arial;
     margin: 0;
@@ -175,6 +180,16 @@ margin-top:12px;
     <h1 id="nm">CLU</h1>
     <h6 id="lm">Covid19LastUpdate #STAYHOME</h6>
     <h6 id="m"></h6>
+
+  </div>
+  <div class="nv">
+    <center>
+    <ul class="menu-items" style="text-align:center">
+      <li><a href="index.html">Stats</a></li>
+      <li><a href="Pred.html">Prediction</a></li>
+</ul>
+</center>
+
   </div>
 </head>
 
@@ -188,7 +203,6 @@ margin-top:12px;
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-
               <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="SEARCH">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <i class="tim-icons icon-simple-remove"></i>
@@ -199,7 +213,6 @@ margin-top:12px;
       </div>
       <!-- End Navbar -->
       <div class="content">
-
         <div class="row">
           <div class="col-12">
             <div class="card card-chart">
@@ -623,10 +636,9 @@ margin-top:12px;
       var t=[]
     $.getJSON( "https://pomber.github.io/covid19/timeseries.json", function( dat ) {
       $.each( dat, function(key, data) {
-        console.log("tar" + JSON.stringify(data[data.length-1]));
-        var usersRef1 = ref.child(data[data.length-1].date);
+        var usersRef1 = ref.child(key);
 
-        var usersRef = usersRef1.child(key);
+        var usersRef = usersRef1.child(data[data.length-1].date);
         usersRef.set({
           cases:data[data.length-1].confirmed,
           deaths:data[data.length-1].deaths,
@@ -642,7 +654,7 @@ margin-top:12px;
           acc[cur.date] = acc[cur.date] + cur.Confirmed || cur.confirmed; // increment or initialize to cur.value
           return acc;
         }, {})
-        var tab=[];$.each( sumPerMonth, function(key, value) {  tab.push(value);});console.log(tab)
+        var tab=[];$.each( sumPerMonth, function(key, value) {  tab.push(value);});
         a=a+tab[0]
         b=b+tab[1];
         c=c+tab[2]
@@ -752,9 +764,7 @@ console.log(data);
           acc[cur.date] = acc[cur.date]  || cur.recovered; // increment or initialize to cur.value
           return acc;
         }, {})
-        console.log(key)
-        console.log(sumPerMonth)
-        var tabb=[];$.each( sumPerMonth, function(key, value) {  tabb.push(value);});console.log(tabb)
+        var tabb=[];$.each( sumPerMonth, function(key, value) {  tabb.push(value);});
         aa=aa+tabb[0]
         bb=bb+tabb[1];
         cc=cc+tabb[2]
@@ -864,9 +874,7 @@ console.log(data);
           acc[cur.date] = acc[cur.date]  || cur.deaths; // increment or initialize to cur.value
           return acc;
         }, {})
-        console.log(key)
-        console.log(sumPerMonth)
-        var tabbb=[];$.each( sumPerMonth, function(key, value) {  tabbb.push(value);});console.log(tabbb)
+        var tabbb=[];$.each( sumPerMonth, function(key, value) {  tabbb.push(value);});
         aaa=aaa+tabbb[0]
         bbb=bbb+tabbb[1];
         ccc=ccc+tabbb[2]
@@ -988,32 +996,18 @@ var snip=[]
           acc[cur.date] = acc[cur.date] + cur.Confirmed || cur.confirmed; // increment or initialize to cur.value
           return acc;
         }, {})
-        var tab=[];$.each( sumPerMonth, function(key, value) {  tab.push(value);});console.log(tab[3])
+        var tab=[];$.each( sumPerMonth, function(key, value) {  tab.push(value);});console.log(tab[3] +JSON.stringify(sumPerMonth))
 
         snip.push(tab[3])
          var collection1 = data.map(x => ({ ...x, date: x.date.split("-"), recovered: Number(x.recovered)}));
 
-          var  mapDayToMonth1 = collection.map(x => ({...x, date: new Date(x.date).getMonth()}));
-
-
-           var sumPerMonth1 = mapDayToMonth.reduce((acc, cur) => {
-            acc[cur.date] = acc[cur.date] +cur.recovered|| cur.recovered; // increment or initialize to cur.value
-            return acc;
-          }, {})
-          var tab1=[];$.each( sumPerMonth1, function(key, value) {  tab1.push(value);});
-          snip.push(tab1[3])
+          var  mapDayToMonth1 = collection1.map(x => ({...x, date: new Date(x.date).getMonth()}));
+          console.log("map"+ JSON.stringify(mapDayToMonth1[mapDayToMonth1.length-1].recovered));
+          snip.push(JSON.stringify(mapDayToMonth1[mapDayToMonth1.length-1].recovered))
           var collection2 = data.map(x => ({ ...x, date: x.date.split("-"), deaths: Number(x.deaths)}));
 
-           var  mapDayToMonth2 = collection.map(x => ({...x, date: new Date(x.date).getMonth()}));
-
-
-            var sumPerMonth2 = mapDayToMonth.reduce((acc, cur) => {
-             acc[cur.date] = acc[cur.date] +cur.deaths || cur.deaths; // increment or initialize to cur.value
-             return acc;
-           }, {})
-           var tab2=[];$.each( sumPerMonth2, function(key, value) {  tab2.push(value);});console.log(tab2[3])
-           snip.push(tab2[3])
-           console.log(snip)
+           var  mapDayToMonth2 = collection2.map(x => ({...x, date: new Date(x.date).getMonth()}));
+           snip.push(JSON.stringify(mapDayToMonth1[mapDayToMonth1.length-1].deaths))
 
 
 }
@@ -1051,7 +1045,12 @@ var snip=[]
         options: {
          	//cutoutPercentage: 40,
           responsive: false,
+    maintainAspectRatio:false,
+    legend: {
+      display: false,
+      position: 'top'
         }
+      }
         });
         };
         changeOrg()
