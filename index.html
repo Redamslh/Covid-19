@@ -1354,7 +1354,7 @@ var cnt=0;
         var tab=[];
         $.each( sumPerMonth, function(key, value) {  tab.push(value);
         tt=tab.SumArray(tt);});console.log(tab[4] +JSON.stringify(sumPerMonth))
-cnt=cnt+tab[4]
+cnt=cnt+tab[8]
          var collection1 = data.map(x => ({ ...x, date: x.date.split("-"), recovered: Number(x.recovered)}));
 
           var  mapDayToMonth1 = collection1.map(x => ({...x, date: new Date(x.date).getMonth()}));
@@ -1363,7 +1363,7 @@ cnt=cnt+tab[4]
             return acc;
           }, {})
           var tabb=[];$.each( sumPerMonth1, function(key, value) {  tabb.push(value);});
-          cnt2=cnt2+tabb[4]
+          cnt2=cnt2+tabb[8]
           var collection2 = data.map(x => ({ ...x, date: x.date.split("-"), deaths: Number(x.deaths)}));
 
            var  mapDayToMonth2 = collection2.map(x => ({...x, date: new Date(x.date).getMonth()}));
@@ -1372,7 +1372,7 @@ cnt=cnt+tab[4]
              return acc;
            }, {})
            var tabbb=[];$.each( sumPerMonth2, function(key, value) {  tabbb.push(value);});
-           cnt1=cnt1+tabbb[4]
+           cnt1=cnt1+tabbb[8]
 
 
 
