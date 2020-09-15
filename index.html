@@ -18,7 +18,7 @@
   <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
   <link rel="icon" type="image/png" href="./assets/img/favicon.png">
   <title>
-CovidLastUp19  </title>
+CovidLastUp  </title>
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
   <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
@@ -874,7 +874,7 @@ margin-top:12px;
 
   <script>
     $(document).ready(function() {
-      var t=[0,0,0,0,0]
+
       /*var firebaseConfig = {
                       apiKey: "AIzaSyD0ogwhSO9wT-iXXszCNoHvZ2x3Ksw30ag",
                       authDomain: "fir-test-97234.firebaseapp.com",
@@ -961,7 +961,7 @@ margin-top:12px;
     return sum;
 }
   var tab=[];
-
+var t=[0,0,0,0,0,0,0,0,0]
       $.each( dat, function(key, data) {
         var usersRef1 = ref.child(key);
 
@@ -985,11 +985,11 @@ margin-top:12px;
         $.each( sumPerMonth, function(key, value) {
             tab.push(value);});
 
-        t=tab.SumArray( t);
+        t=tab.SumArray(t);
 }
         });
         console.log(t+'gg2')
-    $("#i1").html("<h3  class=card-title >"+ "Confirmed Cases : " + t[t.length -1] + "</h3>");
+    $("#i1").html("<h3  class=card-title >"+ "Confirmed Cases : " + t[8] + "</h3>");
       gradientChartOptionsConfiguration =  {
         maintainAspectRatio: false,
         legend: {
@@ -1047,7 +1047,7 @@ margin-top:12px;
       gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
 
       var data = {
-        labels: ['JAN','FEB','MAR','APR','MAY'],
+        labels: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AOU','SEP'],
         datasets: [{
           label: "Data",
           fill: true,
@@ -1078,7 +1078,7 @@ console.log(data);
       var cc=0;
       var dd=0;
 var ee=0;
-      var tb=[0,0,0,0,0]
+      var tb=[0,0,0,0,0,0,0,0,0]
       Array.prototype.SumArray = function (arr) {
     var sum = [];
     if (arr != null && this.length == arr.length) {
@@ -1107,7 +1107,7 @@ var tabb=[];
   tb=tabb.SumArray(tb);
       }
         });
-    $("#i2").html("<h3  class=card-title >" + "Recovered : "+ tb[4] + "</h3>");
+    $("#i2").html("<h3  class=card-title >" + "Recovered : "+ tb[8] + "</h3>");
       gradientChartOptionsConfiguration =  {
         maintainAspectRatio: false,
         legend: {
@@ -1165,7 +1165,7 @@ var tabb=[];
       gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
 
       var data = {
-        labels: ['JAN','FEB','MAR','APR','MAY'],
+        labels: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AOU','SEP'],
         datasets: [{
           label: "Recovred",
           fill: true,
@@ -1196,7 +1196,7 @@ console.log(data);
       var ddd=0;
       var eee=0
       var tbb=[]
-      var tbb1=[0,0,0,0,0]
+      var tbb1=[0,0,0,0,0,0,0,0,0]
       Array.prototype.SumArray = function (arr) {
     var sum = [];
     if (arr != null && this.length == arr.length) {
@@ -1284,7 +1284,7 @@ var tabbb=[]
       gradientStroke.addColorStop(0, 'rgba(119,52,169,0)'); //purple colors
 
       var data = {
-        labels: ['JAN','FEB','MAR','APR','MAY'],
+        labels: ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AOU','SEP'],
         datasets: [{
           label: "Data",
           fill: true,
@@ -1583,4 +1583,3 @@ snip.push(cnt1)
 
 
 </html>
-
